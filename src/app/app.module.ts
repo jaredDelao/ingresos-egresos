@@ -14,6 +14,10 @@ import { NavbarComponent } from "./shared/navbar/navbar.component";
 import { SidebarComponent } from "./shared/sidebar/sidebar.component";
 
 import { FormsModule } from "@angular/forms";
+import { StoreModule } from '@ngrx/store';
+import { appReducers } from './app.reducer';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+
 
 // Firebase
 import { AngularFireModule } from "@angular/fire";
@@ -41,6 +45,10 @@ import { environment } from 'src/environments/environment';
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
     AngularFireAuthModule,
+    StoreModule.forRoot(appReducers),
+    StoreDevtoolsModule.instrument({
+      maxAge: 5
+    })
   ],
   providers: [],
   bootstrap: [AppComponent]

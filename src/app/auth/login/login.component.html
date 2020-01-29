@@ -61,6 +61,10 @@
                 class="text-black text-small"
                 >Crear una cuenta</a
               >
+              <button *ngIf="cargando" [disabled]="true" class="btn btn-primary submit-btn btn-block">
+                <i class="fa fa-spin fa-sync"></i>
+                Ingresando, espere por favor...
+              </button>
             </div>
           </form>
         </div>
