@@ -18,22 +18,23 @@ import { Subscription } from 'rxjs';
 export class AuthService {
 
   userSubscription: Subscription = new Subscription();
+  usuario: User;
 
   constructor(private afAuth: AngularFireAuth, private router: Router,
-              private store: Store<AppState>, private afDB: AngularFirestore) {}
+    private store: Store<AppState>, private afDB: AngularFirestore) { }
 
   initAuthListener() {
     this.afAuth.authState.subscribe((fireUSer: firebase.User) => {
       console.log(fireUSer);
-      if ( fireUSer) {
+      if (fireUSer) {
         this.userSubscription = this.afDB.doc(`${fireUSer.uid}/usuario`).valueChanges()
           .subscribe((usuarioObj: any) => {
-
             const newUser = new User(usuarioObj);
             this.store.dispatch(new SetUserAction(newUser));
-            
+            this.usuario = newUser;
           })
       } else {
+        // this.usuario = null;
         this.userSubscription.unsubscribe();
       }
     });
@@ -41,13 +42,24 @@ export class AuthService {
 
   crearUsuario(nombre: string, email: string, password: string) {
 
-    this.store.dispatch( new ActivarLoadingAction() );
+    this.store.dispatch(new ActivarLoadingAction());
 
     this.afAuth.auth
       .createUserWithEmailAndPassword(email, password)
       .then(resp => {
-        this.store.dispatch( new DesactivarLoadingAction() );
-        this.router.navigate(["/"]);
+        const user: User = {
+          uid: resp.user.uid,
+          nombre: nombre,
+          email: resp.user.email
+        };
+
+        this.afDB.doc(`${user.uid}/usuario`)
+          .set(user)
+          .then(() => {
+            this.router.navigate(["/"]);
+          })
+
+        this.store.dispatch(new DesactivarLoadingAction());
       })
       .catch(err => {
         console.error(err);
@@ -84,5 +96,9 @@ export class AuthService {
         }
         return fireUSer != null
       }))
+  }
+
+  getUsuario() {
+    return { ...this.usuario };
   }
 }

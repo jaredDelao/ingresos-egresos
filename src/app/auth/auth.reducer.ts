@@ -1,6 +1,5 @@
 import * as fromAuth from './auth.actions';
 import { User } from './user.model';
-import { Action } from '@ngrx/store';
 
 export interface AuthState {
     user: User;
